@@ -1,10 +1,15 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
     [SerializeField] GameObject CharacterObj;
+    [SerializeField] GameObject background1, background2;
+
+    [SerializeField] Vector3 stickHeightenSpeed;
+    [SerializeField] Vector3 stickRotationSpeed;
 
     GameObject P2PLeft, P2PRight;
 
@@ -12,6 +17,8 @@ public class Manager : MonoBehaviour
     int state = 1;
 
     [SerializeField] float platformMoveSpd;
+    [SerializeField] Text scoreText;
+    int score = 0;
 
     //[SerializeField] GameObject minRespawnObj, maxRespawnObj;
     [SerializeField] float minRespawnX, maxRespawnX;
@@ -27,6 +34,7 @@ public class Manager : MonoBehaviour
     {
         //minRespawnX = minRespawnObj.transform.position.x;
         //maxRespawnX = maxRespawnObj.transform.position.x;
+        scoreText.text = "0";
 
         PT_Controller_1 = PF_A_Obj.GetComponent<Platform>();
         PT_Controller_2 = PF_B_Obj.GetComponent<Platform>();
@@ -34,11 +42,21 @@ public class Manager : MonoBehaviour
 
         characterController = CharacterObj.GetComponent<Character>();
 
-        activeStick_Controller = PT_Controller_1.GetStick().GetComponent<Stick>();
+        Stick stick1_tmp = PT_Controller_1.GetStick().GetComponent<Stick>();
+        Stick stick2_tmp = PT_Controller_2.GetStick().GetComponent<Stick>();
+        Stick stick3_tmp = PT_Controller_3.GetStick().GetComponent<Stick>();
+
+        stick1_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.x, stickRotationSpeed.x);
+        stick2_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.y, stickRotationSpeed.y);
+        stick3_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.z, stickRotationSpeed.z);
+
+        activeStick_Controller = stick1_tmp;
         activeStick_Controller.gameObject.SetActive(true);
 
-        //PT_Controller_2.GetStick().GetComponent<Stick>().gameObject.SetActive(false);
-        //PT_Controller_3.GetStick().GetComponent<Stick>().gameObject.SetActive(false);
+        stick2_tmp.gameObject.SetActive(false);
+        stick3_tmp.gameObject.SetActive(false);
+
+
     }
 
     // Update is called once per frame
@@ -96,26 +114,37 @@ public class Manager : MonoBehaviour
         yield return StartCoroutine(activeStick_Controller.RotateStick());
     }
 
+    public IEnumerator RotateStickAfterLose()
+    {
+        yield return StartCoroutine(activeStick_Controller.RotateStickAfterLose());
+
+    }
+
     public void State0()
     {
         //PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX)
-        PT_Controller_1.transform.position = new Vector3( 4, 
+
+        PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX), 
             PT_Controller_1.transform.position.y,
             PT_Controller_1.transform.position.z);
 
-        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(100, 300),
+        PT_Controller_1.UpdateSpriteMaskState();
+
+        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(100, 400),
             PT_Controller_1.GetComponent<RectTransform>().sizeDelta.y);
 
         activeStick_Controller.ResetStick();
+        activeStick_Controller.gameObject.SetActive(false);
 
+        // Swap
         Platform PT_Controller_TMP = PT_Controller_1;
         PT_Controller_1 = PT_Controller_2;
         PT_Controller_2 = PT_Controller_3;
         PT_Controller_3 = PT_Controller_TMP;
 
 
-        //activeStick_Controller.gameObject.SetActive(true);
         activeStick_Controller = PT_Controller_1.GetStick().GetComponent<Stick>();
+        activeStick_Controller.gameObject.SetActive(true);
 
 
         //PT_Controller_2.GetStick().SetActive(false);
@@ -160,12 +189,16 @@ public class Manager : MonoBehaviour
             activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x)
         {
             Debug.Log("Collided");
+
+            score++;
+            scoreText.text = score.ToString();
+
             state = 4;
         }
         else
         {
             Debug.Log("Lose");
-            state = -1;
+            state = 6;
         }
 
     }
@@ -178,6 +211,7 @@ public class Manager : MonoBehaviour
         if (CharacterObj.transform.position.x < PT_Controller_2.GetPlatformPoint(2).transform.position.x - .2f)
         {
             StartCoroutine(MoveCharacter());
+            MoveBackgrounds(characterController.GetMoveSpeed());
         }
         else
         {
@@ -202,6 +236,35 @@ public class Manager : MonoBehaviour
         }
     }
 
+    public void State6()
+    {
+        characterAnimator.SetBool("IdleToWalk", true);
+        // Play hero moving animation
+
+        if (CharacterObj.transform.position.x < PT_Controller_2.GetPlatformPoint(2).transform.position.x - .2f)
+        {
+            StartCoroutine(MoveCharacter());
+        }
+        else
+        {
+            characterAnimator.SetBool("IdleToWalk", false);
+            state = 7;
+        }
+
+    }
+
+    public void State7()
+    {
+        if (activeStick_Controller.IsRotating()) //stickObj.transform.rotation.eulerAngles.z <= 90)
+        {
+            StartCoroutine(RotateStick());
+        }
+        else
+        {
+            state = 3;
+        }
+    }
+
     public IEnumerator MoveCharacter()
     {
         yield return StartCoroutine(characterController.MoveCharacter());
@@ -219,6 +282,11 @@ public class Manager : MonoBehaviour
         PT_Controller_3.MovePlatform(platformMoveSpd);
     }
 
+    public void MoveBackgrounds(float moveSpeed)
+    {
+        background1.transform.position -= new Vector3(moveSpeed * .3f * Time.deltaTime, 0, 0);
+     //   background2.transform.position -= new Vector3(moveSpeed * .5f * Time.deltaTime, 0, 0);
+    }
     public void ReloadScene()
     {
         SceneManager.LoadScene(0);

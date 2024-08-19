@@ -5,7 +5,7 @@ using UnityEngine;
 public class Stick : MonoBehaviour
 {
     RectTransform rectTransform;
-    [SerializeField] float HeightenSpeed, rotationSpeed;
+    float HeightenSpeed, rotationSpeed;
 
     private float currentRotation = 0f;
     private float targetRotation = -90.0f;
@@ -39,6 +39,11 @@ public class Stick : MonoBehaviour
         yield return null;
     }
 
+    public IEnumerator RotateStickAfterLose()
+    {
+
+    }
+
     public void ResetStick()
     {
         currentRotation = 0f;
@@ -47,6 +52,8 @@ public class Stick : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, 0);
         rectTransform.sizeDelta = new Vector2(30, 5);
     }
+
+    public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { rotationSpeed = _rotationSpeed; HeightenSpeed = _heightenSpeed; }
 
     public bool IsRotating() { return isRotating; }
 
