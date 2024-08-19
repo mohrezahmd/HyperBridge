@@ -22,6 +22,7 @@ public class Manager : MonoBehaviour
 
     //[SerializeField] GameObject minRespawnObj, maxRespawnObj;
     [SerializeField] float minRespawnX, maxRespawnX;
+    [SerializeField] Animation loseAnimation;
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
 
@@ -79,12 +80,20 @@ public class Manager : MonoBehaviour
             case 3:
                 State3(); // Detect collision or loose or overgone
                 break;
+
             case 4: // Move character and play its animations
                 State4();
                 break;
+
             case 5: // Initialize the third platform, move the platforms to the left
                 State5();
                 break;
+
+            case 6:
+                State6(); 
+                break;
+
+
         }
         /*
  1 - Generate stickController
@@ -124,7 +133,7 @@ public class Manager : MonoBehaviour
     {
         //PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX)
 
-        PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX), 
+        PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX),
             PT_Controller_1.transform.position.y,
             PT_Controller_1.transform.position.z);
 
@@ -241,29 +250,18 @@ public class Manager : MonoBehaviour
         characterAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
 
-        if (CharacterObj.transform.position.x < PT_Controller_2.GetPlatformPoint(2).transform.position.x - .2f)
+        if (CharacterObj.transform.position.x < activeStick_Controller.GetTip().transform.position.x - .2f)
         {
             StartCoroutine(MoveCharacter());
         }
         else
         {
             characterAnimator.SetBool("IdleToWalk", false);
-            state = 7;
+            characterAnimator.SetBool("IdleToLose", true);
         }
 
     }
 
-    public void State7()
-    {
-        if (activeStick_Controller.IsRotating()) //stickObj.transform.rotation.eulerAngles.z <= 90)
-        {
-            StartCoroutine(RotateStick());
-        }
-        else
-        {
-            state = 3;
-        }
-    }
 
     public IEnumerator MoveCharacter()
     {
@@ -285,7 +283,7 @@ public class Manager : MonoBehaviour
     public void MoveBackgrounds(float moveSpeed)
     {
         background1.transform.position -= new Vector3(moveSpeed * .3f * Time.deltaTime, 0, 0);
-     //   background2.transform.position -= new Vector3(moveSpeed * .5f * Time.deltaTime, 0, 0);
+        //   background2.transform.position -= new Vector3(moveSpeed * .5f * Time.deltaTime, 0, 0);
     }
     public void ReloadScene()
     {
