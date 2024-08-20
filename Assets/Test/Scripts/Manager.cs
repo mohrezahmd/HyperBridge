@@ -57,8 +57,9 @@ public class Manager : MonoBehaviour
         stick2_tmp.gameObject.SetActive(false);
         stick3_tmp.gameObject.SetActive(false);
 
+        Screen.SetResolution(1080, 1920, true, 1);
 
-    }
+}
 
     // Update is called once per frame
     void Update()
