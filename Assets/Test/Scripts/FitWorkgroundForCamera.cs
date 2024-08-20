@@ -15,17 +15,17 @@ public class FitWorkgroundForCamera : MonoBehaviour
         Vector3 topRight = mainCamera.ViewportToWorldPoint(new Vector3(mainCamera.rect.width, mainCamera.rect.height, 0)) * 100;
         Vector3 screenSize = topRight - bottomLeft;
         float screenRation = screenSize.x / screenSize.y;
-        float desiredRatio = transform.localScale.x / transform.localScale.y;
+        float desiredRation = transform.localScale.x / transform.localScale.y;
 
-        if(screenRation > desiredRatio)
+        if(screenRation > desiredRation)
         {
             float height = screenSize.y;
-            transform.localScale = new Vector3(height * desiredRatio, height, 0);
+            transform.localScale = new Vector3(height * desiredRation, height, 0);
         }
         else
         {
             float width = screenSize.x;
-            transform.localScale = new Vector3(width * desiredRatio, width, 0);
+            transform.localScale = new Vector3(width * desiredRation, width, 0);
         }
     }
 
