@@ -10,6 +10,7 @@ public class Manager : MonoBehaviour
 
     [SerializeField] Vector3 stickHeightenSpeed;
     [SerializeField] Vector3 stickRotationSpeed;
+    [SerializeField] Vector2 _stickDimensions;
 
     GameObject P2PLeft, P2PRight;
 
@@ -31,6 +32,7 @@ public class Manager : MonoBehaviour
 
     [SerializeField] Animator characterAnimator;
 
+    [System.Obsolete]
     void Start()
     {
         //minRespawnX = minRespawnObj.transform.position.x;
@@ -51,13 +53,15 @@ public class Manager : MonoBehaviour
         stick2_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.y, stickRotationSpeed.y);
         stick3_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.z, stickRotationSpeed.z);
 
+        stick1_tmp.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
+        stick2_tmp.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
+        stick3_tmp.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
+
         activeStick_Controller = stick1_tmp;
         activeStick_Controller.gameObject.SetActive(true);
 
         stick2_tmp.gameObject.SetActive(false);
         stick3_tmp.gameObject.SetActive(false);
-
-        Screen.SetResolution(1080, 1920, true, 1);
 
 }
 
@@ -152,14 +156,12 @@ public class Manager : MonoBehaviour
         PT_Controller_2 = PT_Controller_3;
         PT_Controller_3 = PT_Controller_TMP;
 
+        activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
+        activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
+        activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
 
         activeStick_Controller = PT_Controller_1.GetStick().GetComponent<Stick>();
         activeStick_Controller.gameObject.SetActive(true);
-
-
-        //PT_Controller_2.GetStick().SetActive(false);
-        //PT_Controller_3.GetStick().SetActive(false);
-
 
         state = 1;
 
@@ -262,7 +264,6 @@ public class Manager : MonoBehaviour
         }
 
     }
-
 
     public IEnumerator MoveCharacter()
     {

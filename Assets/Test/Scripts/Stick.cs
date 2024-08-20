@@ -61,11 +61,12 @@ public class Stick : MonoBehaviour
         targetRotation = -90.0f;
         isRotating = false;
         transform.rotation = Quaternion.Euler(0, 0, 0);
-        rectTransform.sizeDelta = new Vector2(30, 5);
+        rectTransform.sizeDelta = new Vector2(30, 50);
     }
 
     public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { rotationSpeed = _rotationSpeed; HeightenSpeed = _heightenSpeed; }
 
+    public void SetStickDimension(float _width, float _height) { gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(_width, _height); }
     public bool IsRotating() { return isRotating; }
 
     public void StartRotating() { isRotating = true; }
