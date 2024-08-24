@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Stick : MonoBehaviour
@@ -24,22 +23,6 @@ public class Stick : MonoBehaviour
     }
 
     public IEnumerator RotateStick()
-    {
-        float rotationStep = rotationSpeed * Time.deltaTime;
-        if (currentRotation - rotationStep >= targetRotation)
-        {
-            gameObject.transform.Rotate(0, 0, -rotationStep);
-            currentRotation -= rotationStep;
-        }
-        else
-        {
-            isRotating = false;
-            transform.rotation = Quaternion.Euler(0, 0, -90f);
-        }
-        yield return null;
-    }
-
-    public IEnumerator RotateStickAfterLose()
     {
         float rotationStep = rotationSpeed * Time.deltaTime;
         if (currentRotation - rotationStep >= targetRotation)

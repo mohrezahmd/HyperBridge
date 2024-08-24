@@ -6,11 +6,14 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     [SerializeField] GameObject CharacterObj;
-    [SerializeField] GameObject background1, background2;
+    [SerializeField] GameObject background1;
+
+    [SerializeField] GameObject bridgeBlock;
 
     [SerializeField] Vector3 stickHeightenSpeed;
     [SerializeField] Vector3 stickRotationSpeed;
     [SerializeField] Vector2 _stickDimensions;
+    [SerializeField] Vector2 PF_Width;
 
     GameObject P2PLeft, P2PRight;
 
@@ -21,7 +24,6 @@ public class Manager : MonoBehaviour
     [SerializeField] Text scoreText;
     int score = 0;
 
-    //[SerializeField] GameObject minRespawnObj, maxRespawnObj;
     [SerializeField] float minRespawnX, maxRespawnX;
     [SerializeField] Animation loseAnimation;
 
@@ -30,13 +32,10 @@ public class Manager : MonoBehaviour
     Platform PT_Controller_1, PT_Controller_2, PT_Controller_3;
     Stick activeStick_Controller;
 
-    [SerializeField] Animator characterAnimator;
+    [SerializeField] Animator characterAnimator, bridgeAnimator;
 
-    [System.Obsolete]
     void Start()
     {
-        //minRespawnX = minRespawnObj.transform.position.x;
-        //maxRespawnX = maxRespawnObj.transform.position.x;
         scoreText.text = "0";
 
         PT_Controller_1 = PF_A_Obj.GetComponent<Platform>();
@@ -62,10 +61,8 @@ public class Manager : MonoBehaviour
 
         stick2_tmp.gameObject.SetActive(false);
         stick3_tmp.gameObject.SetActive(false);
+    }
 
-}
-
-    // Update is called once per frame
     void Update()
     {
         switch (state)
@@ -95,56 +92,41 @@ public class Manager : MonoBehaviour
                 break;
 
             case 6:
-                State6(); 
+                State6();
                 break;
 
 
         }
+    }
         /*
- 1 - Generate stickController
-     {
-         2 - Release stickController
-         3 - Stick drops
-         4 - Stick stops
-    }
- 5 - Detect collision type
- 6.1 - Collided the second platform
- 6.2 - Not collided the second platform or overpass it
- 7 - Move the character from first platform to second one
- 8 - Move platforms to the left
- 9 - stop the platforms when the second one reached left border
-10 - put the outranged platform at the last position out of the right side
-11 - 
- */
-    }
-
-    public void HoldScreen()
-    {
-        activeStick_Controller.Heighten();
-    }
-
+         1 - Generate stickController
+             {
+                 2 - Release stickController
+                 3 - Stick drops
+                 4 - Stick stops
+            }
+         5 - Detect collision type
+         6.1 - Collided the second platform
+         6.2 - Not collided the second platform or overpass it
+         7 - Move the character from first platform to second one
+         8 - Move platforms to the left
+         9 - stop the platforms when the second one reached left border
+        10 - put the outranged platform at the last position out of the right side
+        11 - 
+         */
+    
     public IEnumerator RotateStick()
     {
         yield return StartCoroutine(activeStick_Controller.RotateStick());
     }
 
-    public IEnumerator RotateStickAfterLose()
-    {
-        yield return StartCoroutine(activeStick_Controller.RotateStickAfterLose());
-
-    }
-
     public void State0()
     {
-        //PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX)
-
         PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX),
             PT_Controller_1.transform.position.y,
             PT_Controller_1.transform.position.z);
 
-        PT_Controller_1.UpdateSpriteMaskState();
-
-        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(100, 400),
+        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(PF_Width.x, PF_Width.y),
             PT_Controller_1.GetComponent<RectTransform>().sizeDelta.y);
 
         activeStick_Controller.ResetStick();
@@ -182,7 +164,7 @@ public class Manager : MonoBehaviour
 
     public void State2()
     {
-        if (activeStick_Controller.IsRotating()) //stickObj.transform.rotation.eulerAngles.z <= 90)
+        if (activeStick_Controller.IsRotating()) 
         {
             StartCoroutine(RotateStick());
         }
@@ -197,8 +179,8 @@ public class Manager : MonoBehaviour
         P2PLeft = PT_Controller_2.GetPlatformPoint(0);
         P2PRight = PT_Controller_2.GetPlatformPoint(2);
 
-        if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
-            activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x)
+        if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x - .1f &&
+            activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x + .1f)
         {
             Debug.Log("Collided");
 
@@ -252,7 +234,6 @@ public class Manager : MonoBehaviour
     {
         characterAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
-
         if (CharacterObj.transform.position.x < activeStick_Controller.GetTip().transform.position.x - .2f)
         {
             StartCoroutine(MoveCharacter());
@@ -285,10 +266,15 @@ public class Manager : MonoBehaviour
     public void MoveBackgrounds(float moveSpeed)
     {
         background1.transform.position -= new Vector3(moveSpeed * .3f * Time.deltaTime, 0, 0);
-        //   background2.transform.position -= new Vector3(moveSpeed * .5f * Time.deltaTime, 0, 0);
     }
+
     public void ReloadScene()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void Test_ADB()
+    {
+        Debug.Log("jjjjjjjjjjjjjjjssssssssssssssssssssssjjjjjjjjjjjjjjjjjjj");
     }
 }
