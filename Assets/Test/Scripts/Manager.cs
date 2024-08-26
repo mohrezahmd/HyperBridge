@@ -8,7 +8,7 @@ public class Manager : MonoBehaviour
     [SerializeField] GameObject CharacterObj;
     [SerializeField] GameObject background1;
 
-    [SerializeField] GameObject bridgeBlock;
+    //[SerializeField] GameObject bridgeBlock;
 
     [SerializeField] Vector3 stickHeightenSpeed;
     [SerializeField] Vector3 stickRotationSpeed;
@@ -25,7 +25,6 @@ public class Manager : MonoBehaviour
     int score = 0;
 
     [SerializeField] float minRespawnX, maxRespawnX;
-    [SerializeField] Animation loseAnimation;
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
 
@@ -98,23 +97,23 @@ public class Manager : MonoBehaviour
 
         }
     }
-        /*
-         1 - Generate stickController
-             {
-                 2 - Release stickController
-                 3 - Stick drops
-                 4 - Stick stops
-            }
-         5 - Detect collision type
-         6.1 - Collided the second platform
-         6.2 - Not collided the second platform or overpass it
-         7 - Move the character from first platform to second one
-         8 - Move platforms to the left
-         9 - stop the platforms when the second one reached left border
-        10 - put the outranged platform at the last position out of the right side
-        11 - 
-         */
-    
+    /*
+     1 - Generate stickController
+         {
+             2 - Release stickController
+             3 - Stick drops
+             4 - Stick stops
+        }
+     5 - Detect collision type
+     6.1 - Collided the second platform
+     6.2 - Not collided the second platform or overpass it
+     7 - Move the character from first platform to second one
+     8 - Move platforms to the left
+     9 - stop the platforms when the second one reached left border
+    10 - put the outranged platform at the last position out of the right side
+    11 - 
+     */
+
     public IEnumerator RotateStick()
     {
         yield return StartCoroutine(activeStick_Controller.RotateStick());
@@ -122,14 +121,22 @@ public class Manager : MonoBehaviour
 
     public void State0()
     {
+        activeStick_Controller.gameObject.SetActive(false);
         PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX),
             PT_Controller_1.transform.position.y,
             PT_Controller_1.transform.position.z);
 
-        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(PF_Width.x, PF_Width.y),
-            PT_Controller_1.GetComponent<RectTransform>().sizeDelta.y);
+        //PT_Controller_1.transform.localScale = new Vector2(Random.Range(PF_Width.x, PF_Width.y),
+        //    PT_Controller_1.transform.localScale.y);
+
+        
+        activeStick_Controller.GetTip().transform.position = new Vector3(
+            (activeStick_Controller.GetComponent<SpriteRenderer>().bounds.min.x + activeStick_Controller.GetComponent<SpriteRenderer>().bounds.max.x) / 2,
+            activeStick_Controller.GetComponent<SpriteRenderer>().bounds.max.y,
+            0);
 
         activeStick_Controller.ResetStick();
+        activeStick_Controller.GetTip().SetActive(false);
         activeStick_Controller.gameObject.SetActive(false);
 
         // Swap
@@ -137,6 +144,9 @@ public class Manager : MonoBehaviour
         PT_Controller_1 = PT_Controller_2;
         PT_Controller_2 = PT_Controller_3;
         PT_Controller_3 = PT_Controller_TMP;
+
+        PT_Controller_1.GetStick().SetActive(true);
+        PT_Controller_1.GetStick().GetComponent<Stick>().GetTip().SetActive(true);
 
         activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
         activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
@@ -154,10 +164,12 @@ public class Manager : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             activeStick_Controller.Heighten();
+            //activeStick_Controller.Heighten();
         }
         else if (Input.GetMouseButtonUp(0))
         {
             state = 2;
+            Debug.Log(state);
             activeStick_Controller.StartRotating();
         }
     }
@@ -174,13 +186,43 @@ public class Manager : MonoBehaviour
         }
     }
 
+    //public void State3()
+    //{
+    //    P2PLeft = PT_Controller_2.GetPlatformPoint(0);
+    //    P2PRight = PT_Controller_2.GetPlatformPoint(2);
+
+    //    if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x - .1f &&
+    //        activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x + .1f)
+    //    {
+    //        Debug.Log("Collided");
+
+    //        score++;
+    //        scoreText.text = score.ToString();
+
+    //        state = 4;
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Lose");
+    //        state = 6;
+    //    }
+
+    //}
+
     public void State3()
     {
-        P2PLeft = PT_Controller_2.GetPlatformPoint(0);
-        P2PRight = PT_Controller_2.GetPlatformPoint(2);
+        GameObject P2_Left = PT_Controller_2.GetPlatformPoint(0);
+        GameObject P2_Right = PT_Controller_2.GetPlatformPoint(2);
+        GameObject P1_Right = PT_Controller_1.GetPlatformPoint(2);
+        
+        float disPF1_Right_to_PF2_Left = P2_Left.transform.position.x - P1_Right.transform.position.x;
+        float disPF1_Right_to_PF2_right = P2_Right.transform.position.x - P1_Right.transform.position.x;
+        float disPF1_Right_to_TipPosition_X = activeStick_Controller.GetTip().transform.position.x - P1_Right.transform.position.x;
 
-        if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x - .1f &&
-            activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x + .1f)
+        Debug.Log("disP1P2: " + disPF1_Right_to_PF2_Left);
+        Debug.Log("disP1Tip: " + disPF1_Right_to_TipPosition_X);
+
+        if ( disPF1_Right_to_TipPosition_X >= disPF1_Right_to_PF2_Left)// && activeStick_Controller.GetHeight() <= distance2)
         {
             Debug.Log("Collided");
 
@@ -194,7 +236,6 @@ public class Manager : MonoBehaviour
             Debug.Log("Lose");
             state = 6;
         }
-
     }
 
     public void State4()
@@ -205,7 +246,7 @@ public class Manager : MonoBehaviour
         if (CharacterObj.transform.position.x < PT_Controller_2.GetPlatformPoint(2).transform.position.x - .2f)
         {
             StartCoroutine(MoveCharacter());
-            MoveBackgrounds(characterController.GetMoveSpeed());
+            //MoveBackgrounds(characterController.GetMoveSpeed());
         }
         else
         {
