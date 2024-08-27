@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Stick : MonoBehaviour
+public class Stick_L : MonoBehaviour
 {
     RectTransform rectTransform;
     float HeightenSpeed, rotationSpeed;

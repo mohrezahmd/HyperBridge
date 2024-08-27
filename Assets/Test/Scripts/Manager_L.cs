@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Manager : MonoBehaviour
+public class Manager_L : MonoBehaviour
 {
     [SerializeField] GameObject CharacterObj;
     [SerializeField] GameObject background1, background2;
@@ -30,8 +30,8 @@ public class Manager : MonoBehaviour
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
 
-    Platform PT_Controller_1, PT_Controller_2, PT_Controller_3;
-    Stick activeStick_Controller;
+    Platform_L PT_Controller_1, PT_Controller_2, PT_Controller_3;
+    Stick_L activeStick_Controller;
 
     [SerializeField] Animator characterAnimator;
 
@@ -42,15 +42,15 @@ public class Manager : MonoBehaviour
         //maxRespawnX = maxRespawnObj.transform.position.x;
         scoreText.text = "0";
 
-        PT_Controller_1 = PF_A_Obj.GetComponent<Platform>();
-        PT_Controller_2 = PF_B_Obj.GetComponent<Platform>();
-        PT_Controller_3 = PF_C_Obj.GetComponent<Platform>();
+        PT_Controller_1 = PF_A_Obj.GetComponent<Platform_L>();
+        PT_Controller_2 = PF_B_Obj.GetComponent<Platform_L>();
+        PT_Controller_3 = PF_C_Obj.GetComponent<Platform_L>();
 
         characterController = CharacterObj.GetComponent<Character>();
 
-        Stick stick1_tmp = PT_Controller_1.GetStick().GetComponent<Stick>();
-        Stick stick2_tmp = PT_Controller_2.GetStick().GetComponent<Stick>();
-        Stick stick3_tmp = PT_Controller_3.GetStick().GetComponent<Stick>();
+        Stick_L stick1_tmp = PT_Controller_1.GetStick().GetComponent<Stick_L>();
+        Stick_L stick2_tmp = PT_Controller_2.GetStick().GetComponent<Stick_L>();
+        Stick_L stick3_tmp = PT_Controller_3.GetStick().GetComponent<Stick_L>();
 
         stick1_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.x, stickRotationSpeed.x);
         stick2_tmp.SetRotationHeightenSpeed(stickHeightenSpeed.y, stickRotationSpeed.y);
@@ -172,7 +172,7 @@ public class Manager : MonoBehaviour
         activeStick_Controller.gameObject.SetActive(false);
 
         // Swap
-        Platform PT_Controller_TMP = PT_Controller_1;
+        Platform_L PT_Controller_TMP = PT_Controller_1;
         PT_Controller_1 = PT_Controller_2;
         PT_Controller_2 = PT_Controller_3;
         PT_Controller_3 = PT_Controller_TMP;
@@ -181,7 +181,7 @@ public class Manager : MonoBehaviour
         activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
         activeStick_Controller.SetStickDimension(_stickDimensions.x, _stickDimensions.y);
 
-        activeStick_Controller = PT_Controller_1.GetStick().GetComponent<Stick>();
+        activeStick_Controller = PT_Controller_1.GetStick().GetComponent<Stick_L>();
         activeStick_Controller.gameObject.SetActive(true);
 
         state = 1;
