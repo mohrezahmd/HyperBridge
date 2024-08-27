@@ -6,17 +6,14 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     [SerializeField] GameObject CharacterObj;
-<<<<<<< HEAD
     [SerializeField] GameObject background1, background2;
-=======
-    [SerializeField] GameObject background1;
 
     [SerializeField] GameObject bridgeBlock;
->>>>>>> parent of 3689047 (jk)
 
     [SerializeField] Vector3 stickHeightenSpeed;
     [SerializeField] Vector3 stickRotationSpeed;
     [SerializeField] Vector2 _stickDimensions;
+    [SerializeField] Vector2 PF_Width;
 
     GameObject P2PLeft, P2PRight;
 
@@ -128,9 +125,7 @@ public class Manager : MonoBehaviour
     {
         activeStick_Controller.Heighten();
     }
-<<<<<<< HEAD
 
-=======
         /*
          1 - Generate stickController
              {
@@ -148,7 +143,6 @@ public class Manager : MonoBehaviour
         11 - 
          */
     
->>>>>>> parent of 3689047 (jk)
     public IEnumerator RotateStick()
     {
         yield return StartCoroutine(activeStick_Controller.RotateStick());
@@ -162,23 +156,17 @@ public class Manager : MonoBehaviour
 
     public void State0()
     {
-<<<<<<< HEAD
         //PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX)
 
-=======
->>>>>>> parent of 3689047 (jk)
         PT_Controller_1.transform.position = new Vector3(PT_Controller_3.transform.position.x + Random.Range(minRespawnX, maxRespawnX),
             PT_Controller_1.transform.position.y,
             PT_Controller_1.transform.position.z);
 
-<<<<<<< HEAD
         PT_Controller_1.UpdateSpriteMaskState();
 
-        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(100, 400),
-=======
-        PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(PF_Width.x, PF_Width.y),
->>>>>>> parent of 3689047 (jk)
-            PT_Controller_1.GetComponent<RectTransform>().sizeDelta.y);
+        //PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(100, 400),
+        //PT_Controller_1.GetComponent<RectTransform>().sizeDelta = new Vector2(Random.Range(PF_Width.x, PF_Width.y),
+        //    PT_Controller_1.GetComponent<RectTransform>().sizeDelta.y);
 
         activeStick_Controller.ResetStick();
         activeStick_Controller.gameObject.SetActive(false);
@@ -230,13 +218,11 @@ public class Manager : MonoBehaviour
         P2PLeft = PT_Controller_2.GetPlatformPoint(0);
         P2PRight = PT_Controller_2.GetPlatformPoint(2);
 
-<<<<<<< HEAD
         if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
             activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x)
-=======
+
         if (activeStick_Controller.GetTip().transform.position.x >= P2PLeft.transform.position.x - .1f &&
             activeStick_Controller.GetTip().transform.position.x <= P2PRight.transform.position.x + .1f)
->>>>>>> parent of 3689047 (jk)
         {
             Debug.Log("Collided");
 
