@@ -1,18 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
 {
     int state = 0;
     [SerializeField] Platform activePlatform;
+    [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
+
 
     private void Start()
     {
         state = 1;
+        activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
     }
     void Update()
     {
+        //Debug.Log("state: " + state);
+
         switch (state)
         {
             case 0:
@@ -43,7 +49,6 @@ public class Manager : MonoBehaviour
                 State6();
                 break;
 
-
         }
     }
 
@@ -56,14 +61,28 @@ public class Manager : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
         {
             state = 2;
-            activePlatform.RotateStick();
+            activePlatform.StartStickRotation();
         }
     }
 
-    void State2() { }
+    void State2() {
+        if (activePlatform.IsStickRotating()) //stickObj.transform.rotation.eulerAngles.z <= 90)
+        {
+            StartCoroutine(activePlatform.RotateStick());
+        }
+        else
+        {
+            activePlatform.UnparentTipCenter();
+            state = 3;
+        }
+    }
+
     void State3() { }
     void State4() { }
     void State5() { }
     void State6() { }
+
+    public void DebugReloadButton() { SceneManager.LoadScene(0); }
+
 
 }
