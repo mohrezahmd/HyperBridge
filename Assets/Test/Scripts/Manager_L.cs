@@ -17,7 +17,7 @@ public class Manager_L : MonoBehaviour
 
     GameObject P2PLeft, P2PRight;
 
-    Character characterController;
+    Character_L characterController;
     int state = 1;
 
     [SerializeField] float platformMoveSpd;
@@ -46,7 +46,7 @@ public class Manager_L : MonoBehaviour
         PT_Controller_2 = PF_B_Obj.GetComponent<Platform_L>();
         PT_Controller_3 = PF_C_Obj.GetComponent<Platform_L>();
 
-        characterController = CharacterObj.GetComponent<Character>();
+        characterController = CharacterObj.GetComponent<Character_L>();
 
         Stick_L stick1_tmp = PT_Controller_1.GetStick().GetComponent<Stick_L>();
         Stick_L stick2_tmp = PT_Controller_2.GetStick().GetComponent<Stick_L>();

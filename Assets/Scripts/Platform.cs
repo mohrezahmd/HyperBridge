@@ -62,11 +62,11 @@ public class Platform : MonoBehaviour
 
     public void MovePlatform(float moveSpeed)
     {
-        gameObject.transform.position -= new Vector3(moveSpeed * Time.deltaTime, 0, 0);
+        gameObject.transform.position += new Vector3(moveSpeed * Time.deltaTime, 0, 0);
     }
 
     public void UnparentTipCenter() { stickTip.transform.SetParent(gameObject.transform); }
     public void StartStickRotation() { isStickRotating = true; }
     public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { stickRotationSpeed = _rotationSpeed; stickVerticalSpeed = _heightenSpeed; }
-
+    public GameObject GetTip() { return  stickTip; }
 }
