@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: front mask
+    uniqueID: 2893950175
+    locked: 0
+  - name: below mask
+    uniqueID: 3304602977
+    locked: 0

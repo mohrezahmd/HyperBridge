@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 public class Platform : MonoBehaviour
 {
     [SerializeField] GameObject leftP, midP, rightP;
-    [SerializeField] GameObject stickCenter, stickTip, stickObj;
+    [SerializeField] GameObject stickCenter, stickTip, spriteMask;
 
     float stickVerticalSpeed, stickRotationSpeed;
 
@@ -25,6 +25,7 @@ public class Platform : MonoBehaviour
         rightP.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
         stickCenter.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
         stickTip.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
+        //spriteMask.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
     }
 
     public GameObject GetPlatformPoint(int index)
@@ -65,8 +66,21 @@ public class Platform : MonoBehaviour
         gameObject.transform.position += new Vector3(moveSpeed * Time.deltaTime, 0, 0);
     }
 
+    public void ResetPlatform()
+    {
+        stickCenter.transform.Rotate(0, 0, 90);
+
+        currentRotation = 0f;
+        targetRotation = -90.0f;
+        isStickRotating = false;
+        spriteMask.SetActive(false);
+        UnparentTipCenter();
+        UpdatePlatform();
+    }
     public void UnparentTipCenter() { stickTip.transform.SetParent(gameObject.transform); }
+    public void ParentTipCenter() { stickTip.transform.SetParent(stickCenter.transform); }
     public void StartStickRotation() { isStickRotating = true; }
     public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { stickRotationSpeed = _rotationSpeed; stickVerticalSpeed = _heightenSpeed; }
     public GameObject GetTip() { return  stickTip; }
+    public GameObject GetSpriteMask() { return spriteMask; }
 }

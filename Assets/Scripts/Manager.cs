@@ -8,13 +8,19 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     int state = 0;
-    [SerializeField] Platform activePlatform, platform2;
+    [SerializeField] Platform activePlatform;
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
 
-    [SerializeField] GameObject player;
+    [SerializeField] GameObject player, backSpriteMask;
+    float initialBackgroundScale;
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
     Platform PF_Controller_1, PF_Controller_2, PF_Controller_3;
+
+    GameObject P2PLeft;
+    GameObject P2PRight;
+    float goodDistance;
+    float tipHeight;
 
     int score = 1;
     Text scoreText;
@@ -29,6 +35,8 @@ public class Manager : MonoBehaviour
         PF_Controller_1 = PF_A_Obj.GetComponent<Platform>();
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
+
+        initialBackgroundScale = backSpriteMask.transform.localScale.y;
     }
 
 
@@ -67,12 +75,30 @@ public class Manager : MonoBehaviour
         }
     }
 
-    void State0() { }
+    void State0() {
+        activePlatform.transform.position = new Vector3(5, activePlatform.transform.position.y, 0);
+        activePlatform.ResetPlatform();
+
+        Platform PF_Controller_TMP = PF_Controller_1;
+        PF_Controller_1 = PF_Controller_2;
+        PF_Controller_2 = PF_Controller_3;
+        PF_Controller_3 = PF_Controller_TMP;
+        activePlatform = PF_Controller_1;
+
+        activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
+        activePlatform.GetSpriteMask().SetActive(true);
+
+        backSpriteMask.transform.localScale = new Vector3(backSpriteMask.transform.localScale.x, initialBackgroundScale, backSpriteMask.transform.localScale.z);
+
+        state = 1;
+    }
+
     void State1()
     {
         if (Input.GetMouseButton(0))
         {
             activePlatform.HeightenStickTip();
+            //backSpriteMask.GetComponent<SpriteRenderer>().transform.localScale += new Vector3(0, stickVerticalSpeed * Time.deltaTime, 0);
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -83,24 +109,22 @@ public class Manager : MonoBehaviour
 
     void State2()
     {
-        if (activePlatform.IsStickRotating()) //stickObj.transform.rotation.eulerAngles.z <= 90)
+        if (activePlatform.IsStickRotating()) 
         {
             StartCoroutine(activePlatform.RotateStick());
         }
         else
         {
-            activePlatform.UnparentTipCenter();
             state = 3;
         }
     }
 
     void State3()
     {
-        Debug.Log("state3");
-        GameObject P2PLeft = platform2.GetPlatformPoint(0);
-        GameObject P2PRight = platform2.GetPlatformPoint(2);
+        GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
+        GameObject P2PRight = PF_Controller_2.GetPlatformPoint(2);
 
-            if (activePlatform.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
+        if (activePlatform.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
                 activePlatform.GetTip().transform.position.x <= P2PRight.transform.position.x)
             {
                 Debug.Log("Collided");
@@ -121,7 +145,7 @@ public class Manager : MonoBehaviour
         //characterAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
 
-        if (player.transform.position.x < platform2.GetPlatformPoint(2).transform.position.x)
+        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x - .2f )
         {
             player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
             //MoveBackgrounds(characterController.GetMoveSpeed());
@@ -135,9 +159,9 @@ public class Manager : MonoBehaviour
 
     void State5()
     {
-        GameObject P2PLeft = platform2.GetPlatformPoint(0);
+        GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
 
-        if (platform2.transform.position.x > -2.81f)
+        if (PF_Controller_2.transform.position.x > -2.81f)
         {
             player.GetComponent<Player>().MovePlayer(backwardSpeed);
 
