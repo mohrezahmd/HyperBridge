@@ -8,6 +8,10 @@ public class Platform : MonoBehaviour
     [SerializeField] GameObject leftP, midP, rightP;
     [SerializeField] GameObject stickCenter, stickTip, spriteMask;
 
+    [SerializeField] FlatPlatformsSprites spriteSheetSObject;
+    SpriteRenderer spriteRenderer;
+    [SerializeField] float maskOffset, maskSpeed;
+
     float stickVerticalSpeed, stickRotationSpeed;
 
     private float currentRotation = 0f;
@@ -16,16 +20,22 @@ public class Platform : MonoBehaviour
 
     private void Start()
     {
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         UpdatePlatform();
     }
 
     public void UpdatePlatform()
     {
-        leftP.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.min.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
-        rightP.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
-        stickCenter.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
-        stickTip.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
-        //spriteMask.transform.position = new Vector3(GetComponent<SpriteRenderer>().bounds.max.x, GetComponent<SpriteRenderer>().bounds.max.y, 0f);
+        spriteRenderer.sprite = spriteSheetSObject.spriteArray[Random.Range(0, 20)];
+
+
+        leftP.transform.position = new Vector3(spriteRenderer.bounds.min.x, spriteRenderer.bounds.max.y, 0f);
+        rightP.transform.position = new Vector3(spriteRenderer.bounds.max.x, spriteRenderer.bounds.max.y, 0f);
+        stickCenter.transform.position = new Vector3(spriteRenderer.bounds.max.x, spriteRenderer.bounds.max.y, 0f);
+        stickTip.transform.position = new Vector3(spriteRenderer.bounds.max.x, spriteRenderer.bounds.max.y, 0f);
+
+        StartCoroutine(calculateMaskMostRight());
+
     }
 
     public GameObject GetPlatformPoint(int index)
@@ -73,9 +83,19 @@ public class Platform : MonoBehaviour
         currentRotation = 0f;
         targetRotation = -90.0f;
         isStickRotating = false;
+
         spriteMask.SetActive(false);
         UnparentTipCenter();
-        UpdatePlatform();
+        UpdatePlatform();       
+    }
+
+    IEnumerator calculateMaskMostRight()
+    {
+        while(spriteMask.GetComponent<SpriteMask>().bounds.max.x >= GetComponent<SpriteRenderer>().bounds.max.x - maskOffset)
+        {
+            spriteMask.transform.position -= new Vector3(maskSpeed * Time.deltaTime, 0, 0);
+        }
+        yield break;
     }
     public void UnparentTipCenter() { stickTip.transform.SetParent(gameObject.transform); }
     public void ParentTipCenter() { stickTip.transform.SetParent(stickCenter.transform); }
@@ -83,4 +103,6 @@ public class Platform : MonoBehaviour
     public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { stickRotationSpeed = _rotationSpeed; stickVerticalSpeed = _heightenSpeed; }
     public GameObject GetTip() { return  stickTip; }
     public GameObject GetSpriteMask() { return spriteMask; }
+    public void SetPlayerPosition(GameObject player, float playerPositionOffsetX, float playerPositionOffsetY) { player.transform.position = new Vector3(rightP.transform.position.x + playerPositionOffsetX,
+        stickCenter.transform.position.y + playerPositionOffsetY, 0); }
 }

@@ -11,8 +11,9 @@ public class Manager : MonoBehaviour
     [SerializeField] Platform activePlatform;
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
 
-    [SerializeField] GameObject player, backSpriteMask;
-    float initialBackgroundScale;
+    [SerializeField] GameObject player;
+    Animator playerAnimator;
+    //float initialBackgroundScale;
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
     Platform PF_Controller_1, PF_Controller_2, PF_Controller_3;
@@ -22,10 +23,10 @@ public class Manager : MonoBehaviour
     float goodDistance;
     float tipHeight;
 
-    int score = 1;
-    Text scoreText;
+    int score = 0;
+    [SerializeField] Text scoreText;
 
-    [SerializeField] float playerForwardSpeed, backwardSpeed;
+    [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY;
 
     private void Start()
     {
@@ -36,7 +37,8 @@ public class Manager : MonoBehaviour
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
 
-        initialBackgroundScale = backSpriteMask.transform.localScale.y;
+        PF_Controller_1.SetPlayerPosition(player, playerPositionOffsetX, playerPositionOffsetY);
+        playerAnimator = player.GetComponent<Animator>();
     }
 
 
@@ -88,8 +90,6 @@ public class Manager : MonoBehaviour
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.GetSpriteMask().SetActive(true);
 
-        backSpriteMask.transform.localScale = new Vector3(backSpriteMask.transform.localScale.x, initialBackgroundScale, backSpriteMask.transform.localScale.z);
-
         state = 1;
     }
 
@@ -98,7 +98,6 @@ public class Manager : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             activePlatform.HeightenStickTip();
-            //backSpriteMask.GetComponent<SpriteRenderer>().transform.localScale += new Vector3(0, stickVerticalSpeed * Time.deltaTime, 0);
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -129,9 +128,9 @@ public class Manager : MonoBehaviour
             {
                 Debug.Log("Collided");
                 score++;
-                //scoreText.text = score.ToString();
+            scoreText.text = score.ToString();
 
-                state = 4;
+            state = 4;
             }
             else
             {
@@ -142,17 +141,21 @@ public class Manager : MonoBehaviour
 
     void State4() 
     {
-        //characterAnimator.SetBool("IdleToWalk", true);
+        playerAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
 
-        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x - .2f )
+        //Debug.Log("player pos: " + player.transform.position.x);
+        //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
+
+        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX )
         {
-            player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
+            //player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
             //MoveBackgrounds(characterController.GetMoveSpeed());
+            player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
         }
         else
         {
-            //characterAnimator.SetBool("IdleToWalk", false);
+            playerAnimator.SetBool("IdleToWalk", false);
             state = 5;
         }
     }
@@ -160,6 +163,17 @@ public class Manager : MonoBehaviour
     void State5()
     {
         GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
+        int[] i = new int[3];
+        
+
+        if (true)
+        {
+
+        }
+        else
+        {
+
+        }
 
         if (PF_Controller_2.transform.position.x > -2.81f)
         {
