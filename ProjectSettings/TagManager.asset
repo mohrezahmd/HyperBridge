@@ -47,6 +47,9 @@ TagManager:
   - name: front mask
     uniqueID: 2893950175
     locked: 0
+  - name: Platform
+    uniqueID: 4173081985
+    locked: 0
   - name: Player
     uniqueID: 3789680355
     locked: 0
