@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
@@ -17,11 +14,6 @@ public class Manager : MonoBehaviour
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
     Platform PF_Controller_1, PF_Controller_2, PF_Controller_3;
-
-    GameObject P2PLeft;
-    GameObject P2PRight;
-    float goodDistance;
-    float tipHeight;
 
     int score = 0;
     [SerializeField] Text scoreText;
