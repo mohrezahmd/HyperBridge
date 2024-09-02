@@ -157,17 +157,7 @@ public class Manager : MonoBehaviour
         GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
         int[] i = new int[3];
         
-
-        if (true)
-        {
-
-        }
-        else
-        {
-
-        }
-
-        if (PF_Controller_2.transform.position.x > -2.81f)
+        if (PF_Controller_2.GetPlatformPoint(0).transform.position.x > gameObject.GetComponentInParent<SpriteRenderer>().bounds.min.x)
         {
             player.GetComponent<Player>().MovePlayer(backwardSpeed);
 
