@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Manager : MonoBehaviour
 {
@@ -19,9 +20,11 @@ public class Manager : MonoBehaviour
     [SerializeField] Text scoreText;
 
     [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY;
+    [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
 
     private void Start()
     {
+
         state = 1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
 
@@ -29,7 +32,10 @@ public class Manager : MonoBehaviour
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
 
-        PF_Controller_1.SetPlayerPosition(player, playerPositionOffsetX, playerPositionOffsetY);
+        PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x ,
+           PF_Controller_1.GetPlatformPoint(2).transform.position.y + 0.1f);
+
+        //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.y, 0);
         playerAnimator = player.GetComponent<Animator>();
     }
 
@@ -70,7 +76,15 @@ public class Manager : MonoBehaviour
     }
 
     void State0() {
-        activePlatform.transform.position = new Vector3(5, activePlatform.transform.position.y, 0);
+        debugDistance = Random.Range(minDistance, maxDistance);
+
+        debugParentScale = gameObject.transform.parent.transform.localScale.x;
+
+
+        float distanceOffset = PF_Controller_2.GetComponent<SpriteRenderer>().size.x / 2 + PF_Controller_3.GetComponent<SpriteRenderer>().size.x / 2;
+        distanceOfNewPlatform = debugParentScale * debugDistance - distanceOffset;
+
+        activePlatform.transform.position = new Vector3(PF_Controller_2.transform.position.x + distanceOfNewPlatform, activePlatform.transform.position.y, 0);
         activePlatform.ResetPlatform();
 
         Platform PF_Controller_TMP = PF_Controller_1;

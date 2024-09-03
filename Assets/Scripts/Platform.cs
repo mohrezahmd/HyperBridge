@@ -18,6 +18,9 @@ public class Platform : MonoBehaviour
 
     private void Start()
     {
+
+
+        //gameObject.transform.position = new Vector3(transform.position.x, -3f, 0);
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         UpdatePlatform();
     }
