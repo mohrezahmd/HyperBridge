@@ -9,7 +9,7 @@ public class Manager : MonoBehaviour
     [SerializeField] Platform activePlatform;
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
 
-    [SerializeField] GameObject player;
+    [SerializeField] GameObject player, background;
     Animator playerAnimator;
     //float initialBackgroundScale;
 
@@ -19,7 +19,7 @@ public class Manager : MonoBehaviour
     int score = 0;
     [SerializeField] Text scoreText;
 
-    [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY;
+    [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed;
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
 
     private void Start()
@@ -27,6 +27,7 @@ public class Manager : MonoBehaviour
 
         state = 1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
+        debugDistance = Random.Range(minDistance, maxDistance);
 
         PF_Controller_1 = PF_A_Obj.GetComponent<Platform>();
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
@@ -78,13 +79,13 @@ public class Manager : MonoBehaviour
     void State0() {
         debugDistance = Random.Range(minDistance, maxDistance);
 
-        debugParentScale = gameObject.transform.parent.transform.localScale.x;
+        //debugParentScale = gameObject.transform.parent.transform.localScale.x;
 
 
-        float distanceOffset = PF_Controller_2.GetComponent<SpriteRenderer>().size.x / 2 + PF_Controller_3.GetComponent<SpriteRenderer>().size.x / 2;
-        distanceOfNewPlatform = debugParentScale * debugDistance - distanceOffset;
+        //float distanceOffset = PF_Controller_2.GetComponent<SpriteRenderer>().size.x / 2 + PF_Controller_3.GetComponent<SpriteRenderer>().size.x / 2;
+        //distanceOfNewPlatform = ( debugParentScale * debugDistance ) - distanceOffset;
 
-        activePlatform.transform.position = new Vector3(PF_Controller_2.transform.position.x + distanceOfNewPlatform, activePlatform.transform.position.y, 0);
+        activePlatform.transform.position = new Vector3( debugDistance, activePlatform.transform.position.y, 0);
         activePlatform.ResetPlatform();
 
         Platform PF_Controller_TMP = PF_Controller_1;
@@ -155,8 +156,11 @@ public class Manager : MonoBehaviour
 
         if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX )
         {
-            //player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
-            //MoveBackgrounds(characterController.GetMoveSpeed());
+            player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
+
+
+            background.transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+
             player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
         }
         else
@@ -185,7 +189,6 @@ public class Manager : MonoBehaviour
         }
     }
     void State6() { }
-
 
     public void DebugReloadButton() { SceneManager.LoadScene(0); }
 
