@@ -10,6 +10,7 @@ public class Manager : MonoBehaviour
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
 
     [SerializeField] GameObject player, background;
+
     Animator playerAnimator;
     //float initialBackgroundScale;
 

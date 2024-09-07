@@ -6,7 +6,7 @@ public class Platform : MonoBehaviour
     [SerializeField] GameObject leftP, midP, rightP;
     [SerializeField] GameObject stickCenter, stickTip, spriteMask;
 
-    [SerializeField] FlatPlatformsSprites spriteSheetSObject;
+    [SerializeField] MultiSpriteObject spriteSheetSObject;
     SpriteRenderer spriteRenderer;
     [SerializeField] float maskOffset, maskSpeed;
 
