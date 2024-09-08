@@ -1,7 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Manager : MonoBehaviour
 {
@@ -22,12 +22,16 @@ public class Manager : MonoBehaviour
 
     [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed;
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
+    [SerializeField] float maxStickHeight = 6, stickDropSpeed = 0.2f;
+
 
     private void Start()
     {
 
         state = 1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
+        activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
+
         debugDistance = Random.Range(minDistance, maxDistance);
 
         PF_Controller_1 = PF_A_Obj.GetComponent<Platform>();
@@ -37,7 +41,7 @@ public class Manager : MonoBehaviour
         PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x ,
            PF_Controller_1.GetPlatformPoint(2).transform.position.y + 0.1f);
 
-        //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.y, 0);
+        //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.characterLoseCheck, 0);
         playerAnimator = player.GetComponent<Animator>();
     }
 
@@ -70,8 +74,11 @@ public class Manager : MonoBehaviour
                 State5();
                 break;
 
-            case 6:
+            case 6: // Falling after lose
                 State6();
+                break;
+            case 7: // Falling after lose
+                State7();
                 break;
 
         }
@@ -97,6 +104,7 @@ public class Manager : MonoBehaviour
 
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.GetSpriteMask().SetActive(true);
+        activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
 
         state = 1;
     }
@@ -159,10 +167,9 @@ public class Manager : MonoBehaviour
         {
             player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
 
+            background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
 
-            background.transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
-
-            player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
+           // player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
         }
         else
         {
@@ -189,9 +196,50 @@ public class Manager : MonoBehaviour
             state = 0;
         }
     }
-    void State6() { }
+
+    int characterLoseCheck = 0;
+    void State6() {
+
+        playerAnimator.SetBool("IdleToWalk", true);
+        // Play hero moving animation
+
+        //Debug.Log("player pos: " + player.transform.position.x);
+        //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
+        if (player.transform.position.x < PF_Controller_1.GetTip().transform.position.x && characterLoseCheck == 0)
+        {
+            player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
+
+            background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
+
+            //player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
+        }
+        else
+        {
+            characterLoseCheck++;
+            playerAnimator.SetBool("IdleToWalk", false);
+            playerAnimator.SetBool("IdleToLose", true);
+
+            activePlatform.Lose_StartStickRotation();
+            state = 7;
+        }
+
+    }
+
+    void State7()
+    {
+        if (activePlatform.Lose_IsStickRotating())
+        {
+            StartCoroutine(activePlatform.Lose_RotateStick());
+        }
+        else
+        {
+            state = -1;
+            Debug.Log("state : " + state);
+        }
+
+    }
+
 
     public void DebugReloadButton() { SceneManager.LoadScene(0); }
-
 
 }

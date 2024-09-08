@@ -99,4 +99,9 @@ public class Background : MonoBehaviour
     {
         return new GameObject();
     }
+
+    public void UpdateBackgroundPosition(float backgroundBackwardSpeed)
+    {
+        transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+    }
 }
