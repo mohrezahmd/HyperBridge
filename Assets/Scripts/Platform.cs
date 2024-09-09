@@ -52,7 +52,9 @@ public class Platform : MonoBehaviour
         }
     }
 
-    public void HeightenStickTip() { stickTip.transform.Translate(0, stickVerticalSpeed * Time.deltaTime, 0); }
+    public void HeightenStickTip() { 
+        stickTip.transform.Translate(0, stickVerticalSpeed * Time.deltaTime, 0);
+    }
 
     public IEnumerator RotateStick()
     {

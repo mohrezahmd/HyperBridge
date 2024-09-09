@@ -52,7 +52,7 @@ public class Background : MonoBehaviour
             if ((i) % 2 == 0)
             {
                 int tmpSpriteIndex = Random.Range(0, spriteSourceNumber / 2) * 2;
-                Debug.Log("tmpSpriteIndex: " + tmpSpriteIndex);
+                //Debug.Log("tmpSpriteIndex: " + tmpSpriteIndex);
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 tmpRenderer.sprite = spriteSourceObjects[tmpSpriteIndex].GetComponent<SpriteRenderer>().sprite;
@@ -64,7 +64,7 @@ public class Background : MonoBehaviour
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (tmpSpriteBefore != null) { tmpSpriteOffset = (tmpRenderer.sprite.bounds.size.x / 2) + (tmpSpriteBefore.sprite.bounds.size.x / 2); }
                 else { tmpSpriteOffset = tmpRenderer.sprite.bounds.size.x / 2; }
-                Debug.Log("tmpSpriteOffset zoj: " + tmpSpriteOffset);
+                //Debug.Log("tmpSpriteOffset zoj: " + tmpSpriteOffset);
 
                 tmpObject.transform.position += (new Vector3(tmpSpriteOffset, 0, 0) * i);
                 
@@ -72,7 +72,7 @@ public class Background : MonoBehaviour
             else
             {
                 int tmpSpriteIndex = (Random.Range(0, spriteSourceNumber / 2) * 2) + 1;
-                Debug.Log("tmpSpriteIndex: " + tmpSpriteIndex);
+                //Debug.Log("tmpSpriteIndex: " + tmpSpriteIndex);
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 tmpRenderer.sprite = spriteSourceObjects[tmpSpriteIndex].GetComponent<SpriteRenderer>().sprite;
@@ -81,7 +81,7 @@ public class Background : MonoBehaviour
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 float tmpSpriteOffset = (tmpRenderer.sprite.bounds.size.x / 2) + (tmpSpriteBefore.sprite.bounds.size.x / 2);
-                Debug.Log("tmpSpriteOffset fard: " + tmpSpriteOffset);
+                //Debug.Log("tmpSpriteOffset fard: " + tmpSpriteOffset);
 
                 tmpObject.transform.position += (new Vector3(tmpSpriteOffset, 0, 0) * i);
             }
