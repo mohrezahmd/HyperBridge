@@ -52,7 +52,6 @@ public class Background : MonoBehaviour
             if ((i) % 2 == 0)
             {
                 int tmpSpriteIndex = Random.Range(0, spriteSourceNumber / 2) * 2;
-                Debug.Log("tmpSpriteIndex: " + tmpSpriteIndex);
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 tmpRenderer.sprite = spriteSourceObjects[tmpSpriteIndex].GetComponent<SpriteRenderer>().sprite;
