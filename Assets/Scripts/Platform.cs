@@ -11,26 +11,20 @@ public class Platform : MonoBehaviour
     SpriteRenderer spriteRenderer;
     [SerializeField] float maskOffset, maskSpeed;
 
-    float stickHightenSpeed, stickRotationSpeed;
+    float stickVerticalSpeed, stickRotationSpeed;
 
     float currentRotation = 0f;
     float targetRotation = -90.0f;
     bool isStickRotating = false;
     float maxStickHeight, stickDropSpeed;
 
-    float  lose_currentRotation = -90;
-    float  lose_targetRotation = -160f;
-    bool  lose_isStickRotating = false;
-
     private void Start()
     {
+
+
+        //gameObject.transform.position = new Vector3(transform.position.x, -3f, 0);
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         UpdatePlatform();
-    }
-
-    public void InitializePlatform()
-    {
-
     }
 
     public void UpdatePlatform()
@@ -58,7 +52,7 @@ public class Platform : MonoBehaviour
         }
     }
 
-    public void HeightenStickTip() { stickTip.transform.Translate(0, stickHightenSpeed * Time.deltaTime, 0); }
+    public void HeightenStickTip() { stickTip.transform.Translate(0, stickVerticalSpeed * Time.deltaTime, 0); }
 
     public IEnumerator RotateStick()
     {
@@ -77,7 +71,9 @@ public class Platform : MonoBehaviour
         yield return null;
     }
 
-
+      float  lose_currentRotation = -90;
+      float  lose_targetRotation = -160f;
+      bool  lose_isStickRotating = false;
     public IEnumerator Lose_RotateStick()
     {
         float rotationStep = stickRotationSpeed * Time.deltaTime;
@@ -133,16 +129,11 @@ public class Platform : MonoBehaviour
         yield break;
     }
 
-    public void SetStickValues(float _maxStickHeight, float _heightenSpeed, float _rotationSpeed)
-    {
-        maxStickHeight = _maxStickHeight;
-        stickRotationSpeed = _rotationSpeed; 
-        stickHightenSpeed = _heightenSpeed;
-    }
-
+    public void SetStickNums(float _maxStickHeight, float _stickDropSpeed) { maxStickHeight = _maxStickHeight; stickDropSpeed = _stickDropSpeed; }
     public void UnparentTipCenter() { stickTip.transform.SetParent(gameObject.transform); }
     public void ParentTipCenter() { stickTip.transform.SetParent(stickCenter.transform); }
     public void StartStickRotation() { isStickRotating = true; }
+    public void SetRotationHeightenSpeed(float _heightenSpeed, float _rotationSpeed) { stickRotationSpeed = _rotationSpeed; stickVerticalSpeed = _heightenSpeed; }
     public GameObject GetTip() { return stickTip; }
     public GameObject GetSpriteMask() { return spriteMask; }
     public void SetPlayerPosition(GameObject player, float playerPositionOffsetX, float playerPositionOffsetY)

@@ -8,10 +8,10 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - MyFrameMask
+  - 
   - Water
   - UI
-  - Stick
+  - 
   - 
   - 
   - 
@@ -47,15 +47,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Stick
-    uniqueID: 1404284875
+  - name: front mask
+    uniqueID: 2893950175
     locked: 0
   - name: Platform
     uniqueID: 4173081985
     locked: 0
   - name: Player
     uniqueID: 3789680355
-    locked: 0
-  - name: FrontFrame
-    uniqueID: 216218721
     locked: 0

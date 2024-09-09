@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -5,31 +6,31 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     int state = 0;
-    int score = 0;
-    int characterLoseCheck = 0;
-
-    [SerializeField] float stickHightenSpeed, stickRotationSpeed, maxStickHeight = 6;
+    [SerializeField] Platform activePlatform;
+    [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
 
     [SerializeField] GameObject player, background;
 
     Animator playerAnimator;
+    //float initialBackgroundScale;
 
     [SerializeField] GameObject PF_A_Obj, PF_B_Obj, PF_C_Obj;
     Platform PF_Controller_1, PF_Controller_2, PF_Controller_3;
 
-    Platform activePlatform;
-    GameObject P2PLeft, P2PRight; // Second platform's left and right point
-
+    int score = 0;
     [SerializeField] Text scoreText;
 
     [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed;
-
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
+    [SerializeField] float maxStickHeight = 6, stickDropSpeed = 0.2f;
 
 
     private void Start()
     {
+
         state = 1;
+        activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
+        activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
 
         debugDistance = Random.Range(minDistance, maxDistance);
 
@@ -37,15 +38,10 @@ public class Manager : MonoBehaviour
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
 
-        activePlatform = PF_Controller_1;
-        activePlatform.SetStickValues(maxStickHeight, stickHightenSpeed, stickRotationSpeed);
-
-        PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x,
+        PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x ,
            PF_Controller_1.GetPlatformPoint(2).transform.position.y + 0.1f);
 
-        P2PLeft = PF_Controller_2.GetPlatformPoint(0);
-        P2PRight = PF_Controller_2.GetPlatformPoint(2);
-
+        //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.characterLoseCheck, 0);
         playerAnimator = player.GetComponent<Animator>();
     }
 
@@ -81,21 +77,23 @@ public class Manager : MonoBehaviour
             case 6: // Falling after lose
                 State6();
                 break;
-            case 7: // Rotating stikc after lose
+            case 7: // Falling after lose
                 State7();
                 break;
 
         }
     }
 
-    void State0()
-    {
+    void State0() {
         debugDistance = Random.Range(minDistance, maxDistance);
+
+        //debugParentScale = gameObject.transform.parent.transform.localScale.x;
+
 
         //float distanceOffset = PF_Controller_2.GetComponent<SpriteRenderer>().size.x / 2 + PF_Controller_3.GetComponent<SpriteRenderer>().size.x / 2;
         //distanceOfNewPlatform = ( debugParentScale * debugDistance ) - distanceOffset;
 
-        activePlatform.transform.position = new Vector3(debugDistance, activePlatform.transform.position.y, 0);
+        activePlatform.transform.position = new Vector3( debugDistance, activePlatform.transform.position.y, 0);
         activePlatform.ResetPlatform();
 
         Platform PF_Controller_TMP = PF_Controller_1;
@@ -104,11 +102,9 @@ public class Manager : MonoBehaviour
         PF_Controller_3 = PF_Controller_TMP;
         activePlatform = PF_Controller_1;
 
-        activePlatform.SetStickValues(maxStickHeight, stickHightenSpeed, stickRotationSpeed);
+        activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.GetSpriteMask().SetActive(true);
-
-        P2PLeft = PF_Controller_2.GetPlatformPoint(0);
-        P2PRight = PF_Controller_2.GetPlatformPoint(2);
+        activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
 
         state = 1;
     }
@@ -128,78 +124,66 @@ public class Manager : MonoBehaviour
 
     void State2()
     {
-        if (activePlatform.IsStickRotating())
+        if (activePlatform.IsStickRotating()) 
         {
             StartCoroutine(activePlatform.RotateStick());
         }
         else
         {
-            StopCoroutine(activePlatform.RotateStick());
             state = 3;
         }
     }
 
     void State3()
     {
-        player.transform.position += new Vector3(0, 0.07f, 0);
+        GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
+        GameObject P2PRight = PF_Controller_2.GetPlatformPoint(2);
 
         if (activePlatform.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
                 activePlatform.GetTip().transform.position.x <= P2PRight.transform.position.x)
-        {
-            Debug.Log("Collided");
-            score++;
+            {
+                Debug.Log("Collided");
+                score++;
             scoreText.text = score.ToString();
+
             state = 4;
-        }
-        else
-        {           
-            Debug.Log("Lose");
-            state = 6;
-        }
+            }
+            else
+            {
+                Debug.Log("Lose");
+                state = 6;
+            }     
     }
 
-    int isPassing1StickTip2BeforeP2 = 0;
-    void State4()
+    void State4() 
     {
         playerAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
 
-        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX)
-        //if (player.transform.position.x < activePlatform.GetTip().transform.position.x)
+        //Debug.Log("player pos: " + player.transform.position.x);
+        //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
+
+        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX )
         {
             player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
 
             background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
 
-            if (player.transform.position.x > activePlatform.GetTip().transform.position.x && isPassing1StickTip2BeforeP2 == 0)
-            {
-                player.transform.position -= new Vector3(0, 0.07f, 0);
-                isPassing1StickTip2BeforeP2++;
-            }
+           // player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
         }
         else
         {
-            if(isPassing1StickTip2BeforeP2 == 0)
-            {
-                player.transform.position -= new Vector3(0, 0.07f, 0);
-            }
-            else
-            {
-                isPassing1StickTip2BeforeP2 = 0;
-            }
-
-            playerAnimator.SetBool("IdleToWalk", false); 
+            playerAnimator.SetBool("IdleToWalk", false);
             state = 5;
         }
-
-
     }
 
     void State5()
     {
-        P2PLeft = PF_Controller_2.GetPlatformPoint(0);
-
-        if (P2PLeft.transform.position.x > gameObject.GetComponentInParent<SpriteRenderer>().bounds.min.x)
+        GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
+        int[] i = new int[3];
+        
+        if (PF_Controller_2.GetPlatformPoint(0).transform.position.x > gameObject.GetComponentInParent<SpriteRenderer>().bounds.min.x)
         {
             player.GetComponent<Player>().MovePlayer(backwardSpeed);
 
@@ -213,15 +197,21 @@ public class Manager : MonoBehaviour
         }
     }
 
-    void State6()
-    {
-        playerAnimator.SetBool("IdleToWalk", true);
+    int characterLoseCheck = 0;
+    void State6() {
 
+        playerAnimator.SetBool("IdleToWalk", true);
+        // Play hero moving animation
+
+        //Debug.Log("player pos: " + player.transform.position.x);
+        //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
         if (player.transform.position.x < PF_Controller_1.GetTip().transform.position.x && characterLoseCheck == 0)
         {
             player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
 
             background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
+
+            //player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
         }
         else
         {
@@ -232,6 +222,7 @@ public class Manager : MonoBehaviour
             activePlatform.Lose_StartStickRotation();
             state = 7;
         }
+
     }
 
     void State7()
@@ -242,11 +233,13 @@ public class Manager : MonoBehaviour
         }
         else
         {
-            StopCoroutine(activePlatform.Lose_RotateStick());
             state = -1;
             Debug.Log("state : " + state);
         }
+
     }
 
+
     public void DebugReloadButton() { SceneManager.LoadScene(0); }
+
 }
