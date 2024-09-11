@@ -46,16 +46,11 @@ public class FitWorkgroundToCamera : MonoBehaviour
 
     void ExpandPlaneHorizontally()
     {
-            Debug.Log(1);
-        Debug.Log("min x plane 2: " + framePlane2.GetComponent<SpriteRenderer>().bounds.min.x);
-        Debug.Log("max sprite bound: " + gameObject.GetComponent<SpriteRenderer>().bounds.max.x);
-
         while(framePlane2.GetComponent<SpriteRenderer>().bounds.min.x > gameObject.GetComponent<SpriteRenderer>().bounds.max.x)
         {
             framePlane2.transform.localScale += new Vector3(.1f, 0, 0);
         }
 
-            Debug.Log(2);
         while (framePlane1.GetComponent<SpriteRenderer>().bounds.max.x < gameObject.GetComponent<SpriteRenderer>().bounds.min.x)
         {
             framePlane1.transform.localScale += new Vector3(.1f, 0, 0);

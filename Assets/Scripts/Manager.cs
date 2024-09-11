@@ -8,6 +8,7 @@ public class Manager : MonoBehaviour
     int state = 0;
     [SerializeField] Platform activePlatform;
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
+    [SerializeField] GameObject accessorScreen;
 
     [SerializeField] GameObject player, background;
 
@@ -20,14 +21,13 @@ public class Manager : MonoBehaviour
     int score = 0;
     [SerializeField] Text scoreText;
 
-    [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed;
+    [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed, littleOffsetOnBridge;
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
     [SerializeField] float maxStickHeight = 6, stickDropSpeed = 0.2f;
 
 
     private void Start()
     {
-
         state = 1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
@@ -38,7 +38,7 @@ public class Manager : MonoBehaviour
         PF_Controller_2 = PF_B_Obj.GetComponent<Platform>();
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
 
-        PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x ,
+        PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x,
            PF_Controller_1.GetPlatformPoint(2).transform.position.y + 0.1f);
 
         //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.characterLoseCheck, 0);
@@ -85,21 +85,32 @@ public class Manager : MonoBehaviour
     }
 
     void State0() {
+        activePlatform.ResetPlatform();
+
+        maxDistance = accessorScreen.GetComponent<RectTransform>().rect.width / 533.3f;
+        minDistance = (activePlatform.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) +
+            (PF_Controller_3.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) +
+            (maxDistance / 1.1f);
+        
+        Debug.Log("max dis: " + maxDistance);
+        Debug.Log("min dis: " + minDistance);
+
         debugDistance = Random.Range(minDistance, maxDistance);
 
-        //debugParentScale = gameObject.transform.parent.transform.localScale.x;
 
+
+        //debugParentScale = gameObject.transform.parent.transform.localScale.x;
 
         //float distanceOffset = PF_Controller_2.GetComponent<SpriteRenderer>().size.x / 2 + PF_Controller_3.GetComponent<SpriteRenderer>().size.x / 2;
         //distanceOfNewPlatform = ( debugParentScale * debugDistance ) - distanceOffset;
 
-        activePlatform.transform.position = new Vector3( debugDistance, activePlatform.transform.position.y, 0);
-        activePlatform.ResetPlatform();
+        activePlatform.transform.position = new Vector3(PF_Controller_3.transform.position.x + debugDistance, activePlatform.transform.position.y, 0);
 
         Platform PF_Controller_TMP = PF_Controller_1;
         PF_Controller_1 = PF_Controller_2;
         PF_Controller_2 = PF_Controller_3;
         PF_Controller_3 = PF_Controller_TMP;
+
         activePlatform = PF_Controller_1;
 
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
@@ -141,20 +152,21 @@ public class Manager : MonoBehaviour
 
         if (activePlatform.GetTip().transform.position.x >= P2PLeft.transform.position.x &&
                 activePlatform.GetTip().transform.position.x <= P2PRight.transform.position.x)
-            {
-                Debug.Log("Collided");
-                score++;
+        {
+            //Debug.Log("Collided");
+            score++;
             scoreText.text = score.ToString();
 
             state = 4;
-            }
-            else
-            {
-                Debug.Log("Lose");
-                state = 6;
-            }     
+        }
+        else
+        {
+            //Debug.Log("Lose");
+            state = 6;
+        }     
     }
 
+    int isPassedToGoUpALittle = 0, isPassedToGoDownALittle = 0;
     void State4() 
     {
         playerAnimator.SetBool("IdleToWalk", true);
@@ -162,6 +174,11 @@ public class Manager : MonoBehaviour
 
         //Debug.Log("player pos: " + player.transform.position.x);
         //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
+        if(player.transform.position.x > activePlatform.GetPlatformPoint(2).transform.position.x && isPassedToGoUpALittle == 0)
+        {
+            player.transform.position += new Vector3(0, littleOffsetOnBridge, 0);
+            isPassedToGoUpALittle++;
+        }
 
         if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX )
         {
@@ -170,9 +187,21 @@ public class Manager : MonoBehaviour
             background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
 
            // player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
+           if(player.transform.position.x > activePlatform.GetTip().transform.position.x && isPassedToGoDownALittle == 0)
+            {
+                player.transform.position -= new Vector3(0, littleOffsetOnBridge, 0);
+                isPassedToGoDownALittle++;
+            }
         }
         else
         {
+            if(isPassedToGoDownALittle == 0)
+            {
+                player.transform.position -= new Vector3(0, littleOffsetOnBridge, 0);
+            }
+
+            isPassedToGoUpALittle = 0;
+            isPassedToGoDownALittle = 0;
             playerAnimator.SetBool("IdleToWalk", false);
             state = 5;
         }
@@ -180,8 +209,6 @@ public class Manager : MonoBehaviour
 
     void State5()
     {
-        GameObject P2PLeft = PF_Controller_2.GetPlatformPoint(0);
-        int[] i = new int[3];
         
         if (PF_Controller_2.GetPlatformPoint(0).transform.position.x > gameObject.GetComponentInParent<SpriteRenderer>().bounds.min.x)
         {
@@ -202,6 +229,11 @@ public class Manager : MonoBehaviour
 
         playerAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
+        if (player.transform.position.x > activePlatform.GetPlatformPoint(2).transform.position.x && isPassedToGoUpALittle == 0)
+        {
+            player.transform.position += new Vector3(0, littleOffsetOnBridge, 0);
+            isPassedToGoUpALittle++;
+        }
 
         //Debug.Log("player pos: " + player.transform.position.x);
         //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
@@ -234,7 +266,7 @@ public class Manager : MonoBehaviour
         else
         {
             state = -1;
-            Debug.Log("state : " + state);
+            //Debug.Log("state : " + state);
         }
 
     }

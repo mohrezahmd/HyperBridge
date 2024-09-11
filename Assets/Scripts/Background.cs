@@ -6,27 +6,34 @@ using UnityEngine.PlayerLoop;
 public class Background : MonoBehaviour
 {
     [SerializeField] MultiSpriteObject spriteSource;
-    int spriteSourceCounter, spriteTargetCounter;
+    [SerializeField] GameObject accessFrame;
 
-    int spriteSourceNumber = 0;
-
-    GameObject tmpObjSprite;
-    SpriteRenderer spriteRenderer;
-    [SerializeField] List<GameObject> spriteTargetObjects, spriteSourceObjects;
+    [SerializeField] List<GameObject> spriteTargetObjects;
     [SerializeField] Vector3 initialPos;
-
-    GameObject tmpObject;
-    SpriteRenderer tmpRenderer;
+    bool isOdd = true;
+    float constantDistance;
 
     private void Start()
     {
         transform.position = initialPos;
-        spriteSourceNumber = spriteSource.spriteArray.Length;
+        constantDistance = (spriteSource.spriteArray[0].bounds.size.x / 2) + (spriteSource.spriteArray[1].bounds.size.x / 2);
 
         spriteTargetObjects = new List<GameObject>();
-        spriteSourceObjects = new List<GameObject>();
 
-        for (int i = 0; i < spriteSourceNumber; i++)
+        GameObject tmpObject;
+        for (int i = 0; i < 3; i++)
+        {
+            tmpObject = new GameObject();
+            tmpObject.transform.SetParent(gameObject.transform);
+            tmpObject.transform.position = initialPos + new Vector3(constantDistance * i, 0, 0);
+
+            SpriteRenderer tmpRenderer = tmpObject.AddComponent<SpriteRenderer>();
+            tmpRenderer.sortingLayerName = "Background";
+            tmpRenderer.sprite = ChooseSpriteRandomly();
+
+            spriteTargetObjects.Add(tmpObject);
+        }
+        /*for (int i = 0; i < spriteSourceNumber; i++)
         {
             tmpObject = new GameObject();
             tmpRenderer = tmpObject.AddComponent<SpriteRenderer>();
@@ -41,7 +48,6 @@ public class Background : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-
             tmpObject = new GameObject();
             tmpObject.transform.SetParent(gameObject.transform);
             tmpObject.transform.position = initialPos;
@@ -86,8 +92,7 @@ public class Background : MonoBehaviour
                 tmpObject.transform.position += (new Vector3(tmpSpriteOffset, 0, 0) * i);
             }
 
-        }
-
+        } */
     }
 
     private void Update()
@@ -95,13 +100,60 @@ public class Background : MonoBehaviour
         transform.position = initialPos;
     }
 
-    public GameObject PickupSprite()
+    public GameObject CycleSprite()
     {
+        GameObject tmpTargetObject = spriteTargetObjects[0];
+
+        spriteTargetObjects.Remove(spriteTargetObjects[0]);
+        tmpTargetObject.GetComponent<SpriteRenderer>().sprite = ChooseSpriteRandomly();
+        ChangeSpriteObjectPosition(tmpTargetObject, spriteTargetObjects[spriteTargetObjects.Count - 1]);
+
+        spriteTargetObjects.Add(tmpTargetObject);
+
         return new GameObject();
+    }
+
+    Sprite ChooseSpriteRandomly()
+    {
+        Sprite mySprite = null;
+        if (!isOdd)
+        {
+            int tmpSpriteIndex = Random.Range(0, spriteSource.spriteArray.Length / 2) * 2;
+            mySprite = spriteSource.spriteArray[tmpSpriteIndex];
+        }
+        else
+        {
+            int tmpSpriteIndex = (Random.Range(0, spriteSource.spriteArray.Length / 2) * 2) + 1;
+            mySprite = spriteSource.spriteArray[tmpSpriteIndex];
+        }
+
+        isOdd = !isOdd;
+        return mySprite;
+    }
+
+    void ChangeSpriteObjectPosition(GameObject sprite0, GameObject spriteLast)
+    {
+        sprite0.transform.position = spriteLast.transform.position + new Vector3(spriteLast.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2 +
+                                                                                 sprite0.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2
+            , 0, 0);
     }
 
     public void UpdateBackgroundPosition(float backgroundBackwardSpeed)
     {
-        transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+        initialPos += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+
+        float maxBoundX = spriteTargetObjects[0].GetComponent<SpriteRenderer>().bounds.max.x;
+        float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) / 512;
+
+        //Debug.Log("transform position x: " + spriteTargetObjects[0].transform.position.x);
+        //Debug.Log("bound max: " + maxBoundX);
+        //Debug.Log("negative rect: " + negativeRect);
+
+        if (maxBoundX <= negativeRect)
+        {
+            //Debug.Log("bound max x: " + tmpFloat);
+            //Debug.Log(6);
+            CycleSprite();
+        }
     }
 }

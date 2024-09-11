@@ -31,7 +31,6 @@ public class Platform : MonoBehaviour
     {
         spriteRenderer.sprite = spriteSheetSObject.spriteArray[Random.Range(0, 20)];
 
-
         leftP.transform.position = new Vector3(spriteRenderer.bounds.min.x, spriteRenderer.bounds.max.y, 0f);
         rightP.transform.position = new Vector3(spriteRenderer.bounds.max.x, spriteRenderer.bounds.max.y, 0f);
         stickCenter.transform.position = new Vector3(spriteRenderer.bounds.max.x, spriteRenderer.bounds.max.y, 0f);
