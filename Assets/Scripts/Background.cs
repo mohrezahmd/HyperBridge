@@ -24,7 +24,7 @@ public class Background : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             tmpObject = new GameObject();
-            tmpObject.transform.SetParent(gameObject.transform);
+            tmpObject.transform.SetParent(transform.parent);
             tmpObject.transform.position = initialPos + new Vector3(constantDistance * i, 0, 0);
 
             SpriteRenderer tmpRenderer = tmpObject.AddComponent<SpriteRenderer>();
@@ -95,10 +95,10 @@ public class Background : MonoBehaviour
         } */
     }
 
-    private void Update()
-    {
-        transform.position = initialPos;
-    }
+    //private void Update()
+    //{
+    //    spriteTargetObjects.transform.position = initialPos;
+    //}
 
     public GameObject CycleSprite()
     {
@@ -133,15 +133,18 @@ public class Background : MonoBehaviour
 
     void ChangeSpriteObjectPosition(GameObject sprite0, GameObject spriteLast)
     {
-        sprite0.transform.position = spriteLast.transform.position + new Vector3(spriteLast.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2 +
-                                                                                 sprite0.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2
-            , 0, 0);
+        sprite0.transform.position = spriteLast.transform.position + new Vector3((spriteLast.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2 +
+                                                                                 sprite0.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) 
+          , 0, 0);
     }
 
     public void UpdateBackgroundPosition(float backgroundBackwardSpeed)
     {
-        initialPos += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
-
+        //initialPos += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+        for (int i = 0; i < spriteTargetObjects.Count; i++)
+        {
+            spriteTargetObjects[i].transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
+        }
         float maxBoundX = spriteTargetObjects[0].GetComponent<SpriteRenderer>().bounds.max.x;
         float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) / 512;
 
