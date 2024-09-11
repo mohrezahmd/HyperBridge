@@ -10,6 +10,8 @@ public class Background : MonoBehaviour
 
     [SerializeField] List<GameObject> spriteTargetObjects;
     [SerializeField] Vector3 initialPos;
+    [SerializeField] GameObject leftLimit;
+
     bool isOdd = true;
     float constantDistance;
 
@@ -133,9 +135,9 @@ public class Background : MonoBehaviour
 
     void ChangeSpriteObjectPosition(GameObject sprite0, GameObject spriteLast)
     {
-        sprite0.transform.position = spriteLast.transform.position + new Vector3((spriteLast.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2 +
-                                                                                 sprite0.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) 
-          , 0, 0);
+        float distance = spriteLast.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2 + sprite0.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2;
+        distance *= Manager.sizeRation10;
+        sprite0.transform.position = spriteLast.transform.position + new Vector3(distance, 0, 0);
     }
 
     public void UpdateBackgroundPosition(float backgroundBackwardSpeed)
@@ -145,14 +147,15 @@ public class Background : MonoBehaviour
         {
             spriteTargetObjects[i].transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
         }
-        float maxBoundX = spriteTargetObjects[0].GetComponent<SpriteRenderer>().bounds.max.x;
-        float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) / 512;
+        float maxBoundX =  spriteTargetObjects[0].GetComponent<SpriteRenderer>().bounds.max.x;
+        float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) * 512;
 
-        //Debug.Log("transform position x: " + spriteTargetObjects[0].transform.position.x);
-        //Debug.Log("bound max: " + maxBoundX);
+        Debug.Log("transform position x: " + spriteTargetObjects[0].transform.position.x);
+        Debug.Log("bound max: " + maxBoundX);
         //Debug.Log("negative rect: " + negativeRect);
+        Debug.Log("left limit: " + leftLimit.transform.position.x);
 
-        if (maxBoundX <= negativeRect)
+        if (maxBoundX <= leftLimit.transform.position.x)
         {
             //Debug.Log("bound max x: " + tmpFloat);
             //Debug.Log(6);

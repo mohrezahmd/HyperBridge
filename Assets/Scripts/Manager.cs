@@ -25,9 +25,13 @@ public class Manager : MonoBehaviour
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
     [SerializeField] float maxStickHeight = 6, stickDropSpeed = 0.2f;
 
+    public static float sizeRation10;
 
     private void Start()
     {
+        sizeRation10 = transform.parent.localScale.y / 10;
+        Debug.Log("manager ratio: " + sizeRation10);
+
         state = 1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
@@ -92,8 +96,8 @@ public class Manager : MonoBehaviour
             (PF_Controller_3.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) +
             (maxDistance / 1.1f);
         
-        Debug.Log("max dis: " + maxDistance);
-        Debug.Log("min dis: " + minDistance);
+        //Debug.Log("max dis: " + maxDistance);
+        //Debug.Log("min dis: " + minDistance);
 
         debugDistance = Random.Range(minDistance, maxDistance);
 
