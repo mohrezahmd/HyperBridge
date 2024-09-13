@@ -148,12 +148,11 @@ public class Background : MonoBehaviour
             spriteTargetObjects[i].transform.position += new Vector3(backgroundBackwardSpeed * Time.deltaTime, 0, 0);
         }
         float maxBoundX =  spriteTargetObjects[0].GetComponent<SpriteRenderer>().bounds.max.x;
-        float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) * 512;
+        //float negativeRect = (-accessFrame.GetComponent<RectTransform>().sizeDelta.x / 2) * 512;
 
-        Debug.Log("transform position x: " + spriteTargetObjects[0].transform.position.x);
-        Debug.Log("bound max: " + maxBoundX);
-        //Debug.Log("negative rect: " + negativeRect);
-        Debug.Log("left limit: " + leftLimit.transform.position.x);
+        //Debug.Log("transform position x: " + spriteTargetObjects[0].transform.position.x);
+        //Debug.Log("bound max: " + maxBoundX);
+        //Debug.Log("left limit: " + leftLimit.transform.position.x);
 
         if (maxBoundX <= leftLimit.transform.position.x)
         {

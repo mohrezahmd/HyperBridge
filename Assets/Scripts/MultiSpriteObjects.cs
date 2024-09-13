@@ -4,5 +4,4 @@ using UnityEngine;
 public class MultiSpriteObject : ScriptableObject
 {
     public Sprite[] spriteArray;
-    public Texture2D[] texture2Ds;
 }

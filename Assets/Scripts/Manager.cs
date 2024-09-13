@@ -43,7 +43,7 @@ public class Manager : MonoBehaviour
         PF_Controller_3 = PF_C_Obj.GetComponent<Platform>();
 
         PF_Controller_1.SetPlayerPosition(player, PF_Controller_1.GetPlatformPoint(2).transform.position.x,
-           PF_Controller_1.GetPlatformPoint(2).transform.position.y + 0.1f);
+           PF_Controller_1.GetPlatformPoint(2).transform.position.y + (0.1f * sizeRation10));
 
         //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.characterLoseCheck, 0);
         playerAnimator = player.GetComponent<Animator>();
@@ -94,10 +94,10 @@ public class Manager : MonoBehaviour
         maxDistance = accessorScreen.GetComponent<RectTransform>().rect.width / 533.3f;
         minDistance = (activePlatform.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) +
             (PF_Controller_3.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2) +
-            (maxDistance / 1.1f);
-        
-        //Debug.Log("max dis: " + maxDistance);
-        //Debug.Log("min dis: " + minDistance);
+            (maxDistance / 1);
+
+        Debug.Log("max dis: " + maxDistance);
+        Debug.Log("min dis: " + minDistance);
 
         debugDistance = Random.Range(minDistance, maxDistance);
 
