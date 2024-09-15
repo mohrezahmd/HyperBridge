@@ -6,6 +6,11 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     int state = 0;
+    bool isGameStarted = false;
+
+    [SerializeField] GameObject initialCamera;
+    [SerializeField] GameObject mainCamera;
+
     [SerializeField] Platform activePlatform;
     [SerializeField] float stickVerticalSpeed, stickRotationSpeed;
     [SerializeField] GameObject accessorScreen;
@@ -20,6 +25,7 @@ public class Manager : MonoBehaviour
 
     int score = 0;
     [SerializeField] Text scoreText;
+    [SerializeField] GameObject startButton, restartButton, scorePanel;
 
     [SerializeField] float playerForwardSpeed, backwardSpeed, playerPositionOffsetX, playerPositionOffsetY, backgroundBackwardSpeed, littleOffsetOnBridge;
     [SerializeField] float minDistance, maxDistance, debugDistance, distanceOfNewPlatform, debugParentScale; // coefficient of min and max for calculating new position for exited platform
@@ -30,9 +36,9 @@ public class Manager : MonoBehaviour
     private void Start()
     {
         sizeRation10 = transform.parent.localScale.y / 10;
-        Debug.Log("manager ratio: " + sizeRation10);
+        //Debug.Log("manager ratio: " + sizeRation10);
 
-        state = 1;
+        state = -1;
         activePlatform.SetRotationHeightenSpeed(stickVerticalSpeed, stickRotationSpeed);
         activePlatform.SetStickNums(maxStickHeight, stickDropSpeed);
 
@@ -47,6 +53,7 @@ public class Manager : MonoBehaviour
 
         //player.transform.position = new Vector3( activePlatform.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX, player.transform.position.characterLoseCheck, 0);
         playerAnimator = player.GetComponent<Animator>();
+
     }
 
 
@@ -88,7 +95,56 @@ public class Manager : MonoBehaviour
         }
     }
 
-    void State0() {
+    public void PushStartButton()
+    {
+        StartCoroutine(FitCamera());
+        startButton.SetActive(false);
+        scoreText.gameObject.transform.parent.gameObject.SetActive(true);
+    }
+
+    public void PushRestartButton()
+    {
+        DebugReloadButton();
+    }
+
+    [SerializeField] float initialCamSizeSpeed, initialCamXSpeed, initialCamYSpeed, initialCamLimitOffset;
+    IEnumerator FitCamera()
+    {
+        while (initialCamera.GetComponent<Camera>().orthographicSize <= 4.9 ||
+            initialCamera.transform.position.x - initialCamLimitOffset <= mainCamera.transform.position.x - initialCamLimitOffset ||
+                  initialCamera.transform.position.y - initialCamLimitOffset <= mainCamera.transform.position.y - initialCamLimitOffset)
+        {
+            yield return new WaitForSeconds(0.01f);
+
+            if (initialCamera.GetComponent<Camera>() && initialCamera.GetComponent<Camera>().orthographicSize <= 5)
+            {
+                Debug.Log(1);
+                initialCamera.GetComponent<Camera>().orthographicSize += initialCamSizeSpeed;
+            }
+
+            if (initialCamera.GetComponent<Camera>() && initialCamera.transform.position.x <= mainCamera.transform.position.x - initialCamLimitOffset)
+            {
+                Debug.Log(2);
+                initialCamera.transform.position += new Vector3(initialCamXSpeed, 0, 0);
+            }
+
+            if (initialCamera.GetComponent<Camera>() && initialCamera.transform.position.y <= mainCamera.transform.position.y - initialCamLimitOffset)
+            {
+                Debug.Log(3);
+                initialCamera.transform.position += new Vector3(0, initialCamSizeSpeed, 0);
+            }
+        }
+
+        initialCamera.SetActive(false);
+        yield return new WaitForSeconds(1f);
+        state = 1;
+
+        //yield break;
+        //yield return null;
+    }
+
+    void State0()
+    {
         activePlatform.ResetPlatform();
 
         maxDistance = accessorScreen.GetComponent<RectTransform>().rect.width / 533.3f;
@@ -100,8 +156,6 @@ public class Manager : MonoBehaviour
         Debug.Log("min dis: " + minDistance);
 
         debugDistance = Random.Range(minDistance, maxDistance);
-
-
 
         //debugParentScale = gameObject.transform.parent.transform.localScale.x;
 
@@ -139,7 +193,7 @@ public class Manager : MonoBehaviour
 
     void State2()
     {
-        if (activePlatform.IsStickRotating()) 
+        if (activePlatform.IsStickRotating())
         {
             StartCoroutine(activePlatform.RotateStick());
         }
@@ -167,31 +221,31 @@ public class Manager : MonoBehaviour
         {
             //Debug.Log("Lose");
             state = 6;
-        }     
+        }
     }
 
     int isPassedToGoUpALittle = 0, isPassedToGoDownALittle = 0;
-    void State4() 
+    void State4()
     {
         playerAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
 
         //Debug.Log("player pos: " + player.transform.position.x);
         //Debug.Log("PF_Controller2.point2.pos: " + PF_Controller_2.GetPlatformPoint(2).transform.position.x);
-        if(player.transform.position.x > activePlatform.GetPlatformPoint(2).transform.position.x && isPassedToGoUpALittle == 0)
+        if (player.transform.position.x > activePlatform.GetPlatformPoint(2).transform.position.x && isPassedToGoUpALittle == 0)
         {
             player.transform.position += new Vector3(0, littleOffsetOnBridge, 0);
             isPassedToGoUpALittle++;
         }
 
-        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX )
+        if (player.transform.position.x < PF_Controller_2.GetPlatformPoint(2).transform.position.x + playerPositionOffsetX)
         {
             player.GetComponent<Player>().MovePlayer(playerForwardSpeed);
 
             background.GetComponent<Background>().UpdateBackgroundPosition(backgroundBackwardSpeed);
 
-           // player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
-           if(player.transform.position.x > activePlatform.GetTip().transform.position.x && isPassedToGoDownALittle == 0)
+            // player.transform.position += new Vector3(playerForwardSpeed * Time.deltaTime, 0, 0);
+            if (player.transform.position.x > activePlatform.GetTip().transform.position.x && isPassedToGoDownALittle == 0)
             {
                 player.transform.position -= new Vector3(0, littleOffsetOnBridge, 0);
                 isPassedToGoDownALittle++;
@@ -199,7 +253,7 @@ public class Manager : MonoBehaviour
         }
         else
         {
-            if(isPassedToGoDownALittle == 0)
+            if (isPassedToGoDownALittle == 0)
             {
                 player.transform.position -= new Vector3(0, littleOffsetOnBridge, 0);
             }
@@ -213,7 +267,7 @@ public class Manager : MonoBehaviour
 
     void State5()
     {
-        
+
         if (PF_Controller_2.GetPlatformPoint(0).transform.position.x > gameObject.GetComponentInParent<SpriteRenderer>().bounds.min.x)
         {
             player.GetComponent<Player>().MovePlayer(backwardSpeed);
@@ -229,8 +283,8 @@ public class Manager : MonoBehaviour
     }
 
     int characterLoseCheck = 0;
-    void State6() {
-
+    void State6()
+    {
         playerAnimator.SetBool("IdleToWalk", true);
         // Play hero moving animation
         if (player.transform.position.x > activePlatform.GetPlatformPoint(2).transform.position.x && isPassedToGoUpALittle == 0)
@@ -270,12 +324,15 @@ public class Manager : MonoBehaviour
         else
         {
             state = -1;
+            restartButton.SetActive(true);
+            scorePanel.SetActive(true);
+            //restartButton.SetActive(true);
             //Debug.Log("state : " + state);
         }
 
     }
 
 
-    public void DebugReloadButton() { SceneManager.LoadScene(0); }
+    public void DebugReloadButton() { SceneManager.LoadScene(0); PlayerPrefs.SetString("MenuState", "GameStarted"); }
 
 }
